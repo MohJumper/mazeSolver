@@ -1,7 +1,8 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class MazeSolver {
-    static Maze m = new Maze();
+
     // static can be simple instantiated
 
     // 0 = wall
@@ -10,6 +11,11 @@ public class MazeSolver {
     // x = row
     // y = column
     public static void main(String[] args){
+        // multiple mazes
+        ArrayList<Maze> mazes = new ArrayList<Maze>();
+
+        Maze m = new Maze();
+
         int[][] maze = {
                 {0, 1, 1, 1, 0, 1, 0, 1, 0},
                 {0, 1, 0, 0, 0, 1, 0, 0, 0},
@@ -19,15 +25,37 @@ public class MazeSolver {
         m.maze = maze;
         m.start = new StartingPosition(2, 6);
         m.path = new LinkedList<StartingPosition>();
-        if (solveMaze(m.start)){
-            System.out.println("You Won !!");
-        }else{
-            System.out.println("No path found!");
+
+        Maze n = new Maze();
+        int[][] n_maze = {
+                {0, 1, 1, 1, 0, 1, 0, 1, 0},
+                {0, 1, 0, 0, 0, 1, 0, 0, 0},
+                {0, 1, 2, 1, 1, 1, 0, 0, 0},
+                {0, 1, 1, 1, 0, 1, 0, 0, 0}
         };
+
+        n.maze = n_maze;
+        n.start = new StartingPosition(2, 6);
+        n.path = new LinkedList<StartingPosition>();
+        //
+        mazes.add(m);
+        mazes.add(n);
+
+        int i = 0;
+        while(i < mazes.size()){
+            if (solveMaze(mazes.get(i))){
+                System.out.println("You Won !!");
+            }else{
+                System.out.println("No path found!");
+            };
+            i++;
+        }
         // push to the start so we can create a stack
     }
 
-    private static boolean solveMaze(StartingPosition sp) {
+    private static boolean solveMaze(Maze m) {
+
+        StartingPosition sp = m.start;
         m.path.push(sp);
         // [row][column]
         while(true){
@@ -35,7 +63,7 @@ public class MazeSolver {
             int y = m.path.peek().y;
             m.maze[y][x] = 0;
             // moving down
-            if(isValid(y+1, x)){
+            if(isValid(y+1, x, m)){
                 if(m.maze[y+1][x] == 2){
                     System.out.println("Moved down.");
                     return true;
@@ -47,7 +75,7 @@ public class MazeSolver {
             }
 
             // move left
-            if(isValid(y, x-1)){
+            if(isValid(y, x-1, m)){
                 if(m.maze[y][x-1] == 2){
                     System.out.println("Moved left.");
                     return true;
@@ -59,7 +87,7 @@ public class MazeSolver {
             }
 
             // move up
-            if(isValid(y-1, x)){
+            if(isValid(y-1, x, m)){
                 if(m.maze[y-1][x] == 2){
                     System.out.println("Moved up.");
                     return true;
@@ -71,7 +99,7 @@ public class MazeSolver {
             }
 
             // move right
-            if(isValid(y, x+1)){
+            if(isValid(y, x+1, m)){
                 if(m.maze[y][x+1] == 2){
                     System.out.println("Moved right.");
                     return true;
@@ -90,7 +118,7 @@ public class MazeSolver {
         }
     }
 
-    public static boolean isValid(int y, int x){
+    public static boolean isValid(int y, int x, Maze m){
         if(y < 0 ||
                 y >= m.maze.length ||
                 x < 0 ||
